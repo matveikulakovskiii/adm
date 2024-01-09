@@ -10,6 +10,21 @@ if(isset($_REQUEST["paarinimi"]) && !empty($_REQUEST["paarinimi"]) && isAdmin())
     $yhendus->close();
     //exit();
 }
+//kommentaaride lisamine
+
+if(isset($_REQUEST["komment"])){
+    if(!empty($_REQUEST["uuskomment"]))
+    global $yhendus;
+    $kask = $yhendus->prepare("UPDATE tantsud SET kommentaarid=CONCAT(kommentaarid, ?) WHERE id=?");
+    $kommentplus=$_REQUEST["uuskomment"]."\n";
+    $kask->bind_param("si",$kommentplus, $_REQUEST["komment"]);
+    $kask->execute();
+    header("Location: $_SERVER[PHP_SELF]");
+    $yhendus->close();
+    //exit();
+}
+
+
 // punktide lisamine
 if(isset($_REQUEST["heatants"]) && $_SESSION['onAdmin']==0){
     global $yhendus;
@@ -76,7 +91,7 @@ if(isset($_SESSION['kasutaja']))
         echo "<td>".$tantsupaar."</td>";
         echo "<td>".$punktid."</td>";
         echo "<td>".$paev."</td>";
-        echo "<td>".$komment."</td>";
+        echo "<td>".nl2br(htmlspecialchars($komment))."</td>";
         echo "<td>
 <form action='?'>
         <input type='hidden' value='$id' name='komment'>
